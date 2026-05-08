@@ -1,0 +1,17 @@
+{
+  "name": "proof-of-priority-app-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for DLT Proof-of-Priority system",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia",
+    "test": "hardhat test"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5",
+    "dotenv": "^16.4.5"
+  }
+}
