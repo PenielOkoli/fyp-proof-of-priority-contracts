@@ -21,7 +21,7 @@ import type {
   TypedLogDescription,
   TypedListener,
   TypedContractMethod,
-} from "./common";
+} from "../common";
 
 export declare namespace AcademicLedger {
   export type ContributionStruct = {
@@ -70,24 +70,16 @@ export interface AcademicLedgerInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "authorizeCollaborator"
-      | "authorizedCollaborators"
-      | "doesProjectExist"
       | "getContributionCount"
       | "getContributions"
       | "getProfile"
-      | "getUserProjects"
       | "hasProfile"
-      | "initializeProject"
       | "isAuthorized"
-      | "isProjectAdmin"
       | "logContribution"
       | "owner"
-      | "projectAdmins"
       | "registerProfile"
       | "researcherProfiles"
       | "revokeCollaborator"
-      | "transferProjectAdmin"
-      | "userProjects"
   ): FunctionFragment;
 
   getEvent(
@@ -96,21 +88,11 @@ export interface AcademicLedgerInterface extends Interface {
       | "CollaboratorRevoked"
       | "ContributionLogged"
       | "ProfileRegistered"
-      | "ProjectAdminTransferred"
-      | "ProjectInitialized"
   ): EventFragment;
 
   encodeFunctionData(
     functionFragment: "authorizeCollaborator",
     values: [string, AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "authorizedCollaborators",
-    values: [string, AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "doesProjectExist",
-    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "getContributionCount",
@@ -125,23 +107,11 @@ export interface AcademicLedgerInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "getUserProjects",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
     functionFragment: "hasProfile",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "initializeProject",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "isAuthorized",
-    values: [string, AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "isProjectAdmin",
     values: [string, AddressLike]
   ): string;
   encodeFunctionData(
@@ -149,10 +119,6 @@ export interface AcademicLedgerInterface extends Interface {
     values: [string, string, string]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "projectAdmins",
-    values: [string]
-  ): string;
   encodeFunctionData(
     functionFragment: "registerProfile",
     values: [string, string]
@@ -165,25 +131,9 @@ export interface AcademicLedgerInterface extends Interface {
     functionFragment: "revokeCollaborator",
     values: [string, AddressLike]
   ): string;
-  encodeFunctionData(
-    functionFragment: "transferProjectAdmin",
-    values: [string, AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "userProjects",
-    values: [AddressLike, BigNumberish]
-  ): string;
 
   decodeFunctionResult(
     functionFragment: "authorizeCollaborator",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "authorizedCollaborators",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "doesProjectExist",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -195,21 +145,9 @@ export interface AcademicLedgerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getProfile", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "getUserProjects",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "hasProfile", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "initializeProject",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "isAuthorized",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "isProjectAdmin",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -217,10 +155,6 @@ export interface AcademicLedgerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "projectAdmins",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "registerProfile",
     data: BytesLike
@@ -231,14 +165,6 @@ export interface AcademicLedgerInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "revokeCollaborator",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "transferProjectAdmin",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "userProjects",
     data: BytesLike
   ): Result;
 }
@@ -322,53 +248,6 @@ export namespace ProfileRegisteredEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace ProjectAdminTransferredEvent {
-  export type InputTuple = [
-    projectId: string,
-    previousAdmin: AddressLike,
-    newAdmin: AddressLike,
-    timestamp: BigNumberish
-  ];
-  export type OutputTuple = [
-    projectId: string,
-    previousAdmin: string,
-    newAdmin: string,
-    timestamp: bigint
-  ];
-  export interface OutputObject {
-    projectId: string;
-    previousAdmin: string;
-    newAdmin: string;
-    timestamp: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
-export namespace ProjectInitializedEvent {
-  export type InputTuple = [
-    projectId: string,
-    admin: AddressLike,
-    timestamp: BigNumberish
-  ];
-  export type OutputTuple = [
-    projectId: string,
-    admin: string,
-    timestamp: bigint
-  ];
-  export interface OutputObject {
-    projectId: string;
-    admin: string;
-    timestamp: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
 export interface AcademicLedger extends BaseContract {
   connect(runner?: ContractRunner | null): AcademicLedger;
   waitForDeployment(): Promise<this>;
@@ -413,76 +292,44 @@ export interface AcademicLedger extends BaseContract {
   ): Promise<this>;
 
   authorizeCollaborator: TypedContractMethod<
-    [_projectId: string, _collaborator: AddressLike],
+    [projectId: string, collaborator: AddressLike],
     [void],
     "nonpayable"
   >;
 
-  authorizedCollaborators: TypedContractMethod<
-    [arg0: string, arg1: AddressLike],
-    [boolean],
-    "view"
-  >;
-
-  doesProjectExist: TypedContractMethod<
-    [_projectId: string],
-    [boolean],
-    "view"
-  >;
-
   getContributionCount: TypedContractMethod<
-    [_projectId: string],
+    [projectId: string],
     [bigint],
     "view"
   >;
 
   getContributions: TypedContractMethod<
-    [_projectId: string],
+    [projectId: string],
     [AcademicLedger.ContributionStructOutput[]],
     "view"
   >;
 
   getProfile: TypedContractMethod<
-    [_wallet: AddressLike],
+    [wallet: AddressLike],
     [AcademicLedger.ResearcherProfileStructOutput],
     "view"
   >;
 
-  getUserProjects: TypedContractMethod<
-    [_user: AddressLike],
-    [string[]],
-    "view"
-  >;
-
-  hasProfile: TypedContractMethod<[_wallet: AddressLike], [boolean], "view">;
-
-  initializeProject: TypedContractMethod<
-    [_projectId: string],
-    [void],
-    "nonpayable"
-  >;
+  hasProfile: TypedContractMethod<[wallet: AddressLike], [boolean], "view">;
 
   isAuthorized: TypedContractMethod<
-    [_projectId: string, _collaborator: AddressLike],
-    [boolean],
-    "view"
-  >;
-
-  isProjectAdmin: TypedContractMethod<
-    [_projectId: string, _wallet: AddressLike],
+    [projectId: string, collaborator: AddressLike],
     [boolean],
     "view"
   >;
 
   logContribution: TypedContractMethod<
-    [_projectId: string, _cid: string, _creditRole: string],
+    [projectId: string, cid: string, creditRole: string],
     [void],
     "nonpayable"
   >;
 
   owner: TypedContractMethod<[], [string], "view">;
-
-  projectAdmins: TypedContractMethod<[arg0: string], [string], "view">;
 
   registerProfile: TypedContractMethod<
     [_name: string, _orcid: string],
@@ -505,21 +352,9 @@ export interface AcademicLedger extends BaseContract {
   >;
 
   revokeCollaborator: TypedContractMethod<
-    [_projectId: string, _collaborator: AddressLike],
+    [projectId: string, collaborator: AddressLike],
     [void],
     "nonpayable"
-  >;
-
-  transferProjectAdmin: TypedContractMethod<
-    [_projectId: string, _newAdmin: AddressLike],
-    [void],
-    "nonpayable"
-  >;
-
-  userProjects: TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
-    [string],
-    "view"
   >;
 
   getFunction<T extends ContractMethod = ContractMethod>(
@@ -529,69 +364,47 @@ export interface AcademicLedger extends BaseContract {
   getFunction(
     nameOrSignature: "authorizeCollaborator"
   ): TypedContractMethod<
-    [_projectId: string, _collaborator: AddressLike],
+    [projectId: string, collaborator: AddressLike],
     [void],
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "authorizedCollaborators"
-  ): TypedContractMethod<[arg0: string, arg1: AddressLike], [boolean], "view">;
-  getFunction(
-    nameOrSignature: "doesProjectExist"
-  ): TypedContractMethod<[_projectId: string], [boolean], "view">;
-  getFunction(
     nameOrSignature: "getContributionCount"
-  ): TypedContractMethod<[_projectId: string], [bigint], "view">;
+  ): TypedContractMethod<[projectId: string], [bigint], "view">;
   getFunction(
     nameOrSignature: "getContributions"
   ): TypedContractMethod<
-    [_projectId: string],
+    [projectId: string],
     [AcademicLedger.ContributionStructOutput[]],
     "view"
   >;
   getFunction(
     nameOrSignature: "getProfile"
   ): TypedContractMethod<
-    [_wallet: AddressLike],
+    [wallet: AddressLike],
     [AcademicLedger.ResearcherProfileStructOutput],
     "view"
   >;
   getFunction(
-    nameOrSignature: "getUserProjects"
-  ): TypedContractMethod<[_user: AddressLike], [string[]], "view">;
-  getFunction(
     nameOrSignature: "hasProfile"
-  ): TypedContractMethod<[_wallet: AddressLike], [boolean], "view">;
-  getFunction(
-    nameOrSignature: "initializeProject"
-  ): TypedContractMethod<[_projectId: string], [void], "nonpayable">;
+  ): TypedContractMethod<[wallet: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "isAuthorized"
   ): TypedContractMethod<
-    [_projectId: string, _collaborator: AddressLike],
-    [boolean],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "isProjectAdmin"
-  ): TypedContractMethod<
-    [_projectId: string, _wallet: AddressLike],
+    [projectId: string, collaborator: AddressLike],
     [boolean],
     "view"
   >;
   getFunction(
     nameOrSignature: "logContribution"
   ): TypedContractMethod<
-    [_projectId: string, _cid: string, _creditRole: string],
+    [projectId: string, cid: string, creditRole: string],
     [void],
     "nonpayable"
   >;
   getFunction(
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "projectAdmins"
-  ): TypedContractMethod<[arg0: string], [string], "view">;
   getFunction(
     nameOrSignature: "registerProfile"
   ): TypedContractMethod<[_name: string, _orcid: string], [void], "nonpayable">;
@@ -613,23 +426,9 @@ export interface AcademicLedger extends BaseContract {
   getFunction(
     nameOrSignature: "revokeCollaborator"
   ): TypedContractMethod<
-    [_projectId: string, _collaborator: AddressLike],
+    [projectId: string, collaborator: AddressLike],
     [void],
     "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "transferProjectAdmin"
-  ): TypedContractMethod<
-    [_projectId: string, _newAdmin: AddressLike],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "userProjects"
-  ): TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
-    [string],
-    "view"
   >;
 
   getEvent(
@@ -659,20 +458,6 @@ export interface AcademicLedger extends BaseContract {
     ProfileRegisteredEvent.InputTuple,
     ProfileRegisteredEvent.OutputTuple,
     ProfileRegisteredEvent.OutputObject
-  >;
-  getEvent(
-    key: "ProjectAdminTransferred"
-  ): TypedContractEvent<
-    ProjectAdminTransferredEvent.InputTuple,
-    ProjectAdminTransferredEvent.OutputTuple,
-    ProjectAdminTransferredEvent.OutputObject
-  >;
-  getEvent(
-    key: "ProjectInitialized"
-  ): TypedContractEvent<
-    ProjectInitializedEvent.InputTuple,
-    ProjectInitializedEvent.OutputTuple,
-    ProjectInitializedEvent.OutputObject
   >;
 
   filters: {
@@ -718,28 +503,6 @@ export interface AcademicLedger extends BaseContract {
       ProfileRegisteredEvent.InputTuple,
       ProfileRegisteredEvent.OutputTuple,
       ProfileRegisteredEvent.OutputObject
-    >;
-
-    "ProjectAdminTransferred(string,address,address,uint256)": TypedContractEvent<
-      ProjectAdminTransferredEvent.InputTuple,
-      ProjectAdminTransferredEvent.OutputTuple,
-      ProjectAdminTransferredEvent.OutputObject
-    >;
-    ProjectAdminTransferred: TypedContractEvent<
-      ProjectAdminTransferredEvent.InputTuple,
-      ProjectAdminTransferredEvent.OutputTuple,
-      ProjectAdminTransferredEvent.OutputObject
-    >;
-
-    "ProjectInitialized(string,address,uint256)": TypedContractEvent<
-      ProjectInitializedEvent.InputTuple,
-      ProjectInitializedEvent.OutputTuple,
-      ProjectInitializedEvent.OutputObject
-    >;
-    ProjectInitialized: TypedContractEvent<
-      ProjectInitializedEvent.InputTuple,
-      ProjectInitializedEvent.OutputTuple,
-      ProjectInitializedEvent.OutputObject
     >;
   };
 }

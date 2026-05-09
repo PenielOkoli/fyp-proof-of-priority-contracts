@@ -3,6 +3,8 @@
 /* eslint-disable */
 import type * as academicLedgerV1BackupSol from "./AcademicLedger_v1_backup.sol";
 export type { academicLedgerV1BackupSol };
+import type * as academicLedgerV2BackupSol from "./AcademicLedger_v2_backup.sol";
+export type { academicLedgerV2BackupSol };
 export type { AcademicLedger } from "./AcademicLedger";
 export * as factories from "./factories";
 export type { AcademicLedger } from "./AcademicLedger_v1_backup.sol/AcademicLedger";
