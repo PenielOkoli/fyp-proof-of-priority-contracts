@@ -75,6 +75,7 @@ export interface AcademicLedgerInterface extends Interface {
       | "getContributionCount"
       | "getContributions"
       | "getProfile"
+      | "getProjectCollaborators"
       | "getUserProjects"
       | "hasProfile"
       | "initializeProject"
@@ -83,6 +84,7 @@ export interface AcademicLedgerInterface extends Interface {
       | "logContribution"
       | "owner"
       | "projectAdmins"
+      | "projectCollaborators"
       | "registerProfile"
       | "researcherProfiles"
       | "revokeCollaborator"
@@ -125,6 +127,10 @@ export interface AcademicLedgerInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "getProjectCollaborators",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getUserProjects",
     values: [AddressLike]
   ): string;
@@ -152,6 +158,10 @@ export interface AcademicLedgerInterface extends Interface {
   encodeFunctionData(
     functionFragment: "projectAdmins",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "projectCollaborators",
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "registerProfile",
@@ -196,6 +206,10 @@ export interface AcademicLedgerInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "getProfile", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "getProjectCollaborators",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getUserProjects",
     data: BytesLike
   ): Result;
@@ -219,6 +233,10 @@ export interface AcademicLedgerInterface extends Interface {
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "projectAdmins",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "projectCollaborators",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -448,6 +466,12 @@ export interface AcademicLedger extends BaseContract {
     "view"
   >;
 
+  getProjectCollaborators: TypedContractMethod<
+    [_projectId: string],
+    [string[]],
+    "view"
+  >;
+
   getUserProjects: TypedContractMethod<
     [_user: AddressLike],
     [string[]],
@@ -483,6 +507,12 @@ export interface AcademicLedger extends BaseContract {
   owner: TypedContractMethod<[], [string], "view">;
 
   projectAdmins: TypedContractMethod<[arg0: string], [string], "view">;
+
+  projectCollaborators: TypedContractMethod<
+    [arg0: string, arg1: BigNumberish],
+    [string],
+    "view"
+  >;
 
   registerProfile: TypedContractMethod<
     [_name: string, _orcid: string],
@@ -557,6 +587,9 @@ export interface AcademicLedger extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "getProjectCollaborators"
+  ): TypedContractMethod<[_projectId: string], [string[]], "view">;
+  getFunction(
     nameOrSignature: "getUserProjects"
   ): TypedContractMethod<[_user: AddressLike], [string[]], "view">;
   getFunction(
@@ -592,6 +625,9 @@ export interface AcademicLedger extends BaseContract {
   getFunction(
     nameOrSignature: "projectAdmins"
   ): TypedContractMethod<[arg0: string], [string], "view">;
+  getFunction(
+    nameOrSignature: "projectCollaborators"
+  ): TypedContractMethod<[arg0: string, arg1: BigNumberish], [string], "view">;
   getFunction(
     nameOrSignature: "registerProfile"
   ): TypedContractMethod<[_name: string, _orcid: string], [void], "nonpayable">;
