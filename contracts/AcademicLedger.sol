@@ -2,15 +2,15 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title  AcademicLedger v4
- * @notice DLT Proof-of-Priority — adds iterable collaborator roster per project.
+ * @title  AcademicLedger v5
+ * @notice DLT Proof-of-Priority with dispute flagging and configurable finalization state machine.
  *
- * NEW IN v4:
- *   - mapping(string => address[]) public projectCollaborators
- *   - getProjectCollaborators() getter
- *   - initializeProject() pushes creator to roster
- *   - authorizeCollaborator() pushes new address (deduplication guard)
- *   - transferProjectAdmin() also roster-tracks the new admin
+ * NEW IN v5:
+ *   - Dispute Flags: isDisputed mapping by contribution hash; flagByAdmin() emits event
+ *   - Finalization State Machine: admin-selected countdown, opt-out, sealed projects
+ *   - ContributionDisputed event logs dispute reason off-chain (zero storage)
+ *   - FinalizationInitiated, FinalizationHalted, FinalizationExecuted events
+ *   - getProjectCollaborators() remains for roster iteration
  */
 contract AcademicLedger {
 
@@ -33,6 +33,12 @@ contract AcademicLedger {
         bool    exists;
     }
 
+    struct ProjectFinalization {
+        bool    isFinalizationActive;
+        uint256 finalizationDeadline;
+        bool    isFinalized;
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // State Variables
     // ─────────────────────────────────────────────────────────────────────────
@@ -46,8 +52,15 @@ contract AcademicLedger {
     mapping(address => string[])                   public  userProjects;
     mapping(string  => bool)                       private projectExists;
 
-    // NEW: iterable roster of all addresses ever authorized per project
+    // Roster of all addresses ever authorized per project
     mapping(string  => address[])                  public  projectCollaborators;
+
+    // NEW: Dispute flags and finalization state
+    mapping(bytes32 => bool)                       public  isDisputed;
+    mapping(string  => ProjectFinalization)        public  projectFinalization;
+
+    uint256 public constant MIN_FINALIZATION_DURATION = 1 days;
+    uint256 public constant MAX_FINALIZATION_DURATION = 30 days;
 
     // ─────────────────────────────────────────────────────────────────────────
     // Events
@@ -83,6 +96,27 @@ contract AcademicLedger {
         string  indexed projectId,
         address indexed previousAdmin,
         address indexed newAdmin,
+        uint256         timestamp
+    );
+
+    // NEW: Dispute and Finalization Events
+    event ContributionDisputed(
+        string  indexed projectId,
+        bytes32 indexed contributionHash,
+        string          reason
+    );
+    event FinalizationInitiated(
+        string  indexed projectId,
+        address indexed admin,
+        uint256         deadline
+    );
+    event FinalizationHalted(
+        string  indexed projectId,
+        address indexed haltedBy,
+        uint256         timestamp
+    );
+    event FinalizationExecuted(
+        string  indexed projectId,
         uint256         timestamp
     );
 
@@ -258,6 +292,128 @@ contract AcademicLedger {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // Dispute Management (Zero-Storage)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * @notice Admin flags a contribution as disputed. No reason stored on-chain.
+     * @dev    Reason logged via event, keeping storage lean and costs low.
+     *         Hash computed as keccak256(projectId + contributor + timestamp)
+     *         to uniquely identify each contribution.
+     */
+    function flagContributionAsDisputed(
+        string  calldata _projectId,
+        address          _contributor,
+        uint256          _timestamp,
+        string  calldata _reason
+    ) external onlyProjectAdmin(_projectId) {
+        require(projectExists[_projectId], "AcademicLedger: project not initialized");
+        require(bytes(_reason).length > 0 && bytes(_reason).length <= 512,
+            "AcademicLedger: reason must be non-empty and <= 512 chars");
+
+        bytes32 hash = keccak256(abi.encodePacked(_projectId, _contributor, _timestamp));
+        isDisputed[hash] = true;
+
+        emit ContributionDisputed(_projectId, hash, _reason);
+    }
+
+    /**
+     * @notice Check if a contribution is flagged as disputed.
+     */
+    function checkIfDisputed(
+        string  calldata _projectId,
+        address          _contributor,
+        uint256          _timestamp
+    ) external view returns (bool) {
+        bytes32 hash = keccak256(abi.encodePacked(_projectId, _contributor, _timestamp));
+        return isDisputed[hash];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Project Finalization (Configurable Opt-Out State Machine)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * @notice Admin initiates finalization countdown.
+     * @dev    Starts a bounded review window. Any authorized user can halt it.
+     *         Once sealed, no new contributions allowed.
+     */
+    function initiateFinalization(
+        string calldata _projectId,
+        uint256 _durationSeconds
+    )
+        external onlyProjectAdmin(_projectId)
+    {
+        require(projectExists[_projectId], "AcademicLedger: project not initialized");
+        require(
+            _durationSeconds >= MIN_FINALIZATION_DURATION &&
+            _durationSeconds <= MAX_FINALIZATION_DURATION,
+            "AcademicLedger: finalization duration out of range"
+        );
+        require(
+            !projectFinalization[_projectId].isFinalized,
+            "AcademicLedger: project already finalized"
+        );
+
+        uint256 deadline = block.timestamp + _durationSeconds;
+        projectFinalization[_projectId] = ProjectFinalization({
+            isFinalizationActive: true,
+            finalizationDeadline: deadline,
+            isFinalized:          false
+        });
+
+        emit FinalizationInitiated(_projectId, msg.sender, deadline);
+    }
+
+    /**
+     * @notice Authorized user halts active finalization (resets timer).
+     * @dev    Anyone authorized to contribute can halt if they spot an error.
+     *         Resets the countdown to zero.
+     */
+    function haltFinalization(string calldata _projectId)
+        external onlyAuthorized(_projectId)
+    {
+        ProjectFinalization storage fin = projectFinalization[_projectId];
+        require(fin.isFinalizationActive, "AcademicLedger: finalization not active");
+        require(!fin.isFinalized, "AcademicLedger: project already finalized");
+
+        fin.isFinalizationActive = false;
+        fin.finalizationDeadline  = 0;
+
+        emit FinalizationHalted(_projectId, msg.sender, block.timestamp);
+    }
+
+    /**
+     * @notice Anyone can seal the project once 7 days have elapsed.
+     * @dev    Checks deadline, prevents re-entry, and locks the project.
+     */
+    function executeFinalization(string calldata _projectId)
+        external
+    {
+        ProjectFinalization storage fin = projectFinalization[_projectId];
+        require(fin.isFinalizationActive, "AcademicLedger: finalization not active");
+        require(!fin.isFinalized, "AcademicLedger: already finalized");
+        require(
+            block.timestamp >= fin.finalizationDeadline,
+            "AcademicLedger: deadline not reached"
+        );
+
+        fin.isFinalized = true;
+        fin.isFinalizationActive = false;
+
+        emit FinalizationExecuted(_projectId, block.timestamp);
+    }
+
+    /**
+     * @notice Get finalization status of a project.
+     */
+    function getFinalizationStatus(string memory _projectId)
+        external view returns (ProjectFinalization memory)
+    {
+        return projectFinalization[_projectId];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Contribution Logging
     // ─────────────────────────────────────────────────────────────────────────
 
@@ -270,6 +426,12 @@ contract AcademicLedger {
         require(bytes(_cid).length        > 0, "AcademicLedger: cid empty");
         require(bytes(_creditRole).length > 0, "AcademicLedger: creditRole empty");
         require(projectExists[_projectId],      "AcademicLedger: project not initialized");
+
+        // NEW: Check if project is finalized
+        require(
+            !projectFinalization[_projectId].isFinalized,
+            "AcademicLedger: project is finalized"
+        );
 
         contributions[_projectId].push(Contribution({
             contributor: msg.sender,

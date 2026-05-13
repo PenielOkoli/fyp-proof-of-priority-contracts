@@ -17,25 +17,7 @@ declare module "hardhat/types/runtime" {
       name: "AcademicLedger",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AcademicLedger__factory>;
-    getContractFactory(
-      name: "AcademicLedger",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.AcademicLedger__factory>;
-    getContractFactory(
-      name: "AcademicLedger",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.AcademicLedger__factory>;
 
-    getContractAt(
-      name: "AcademicLedger",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.AcademicLedger>;
-    getContractAt(
-      name: "AcademicLedger",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.AcademicLedger>;
     getContractAt(
       name: "AcademicLedger",
       address: string | ethers.Addressable,
@@ -46,25 +28,7 @@ declare module "hardhat/types/runtime" {
       name: "AcademicLedger",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AcademicLedger>;
-    deployContract(
-      name: "AcademicLedger",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AcademicLedger>;
-    deployContract(
-      name: "AcademicLedger",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AcademicLedger>;
 
-    deployContract(
-      name: "AcademicLedger",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AcademicLedger>;
-    deployContract(
-      name: "AcademicLedger",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AcademicLedger>;
     deployContract(
       name: "AcademicLedger",
       args: any[],

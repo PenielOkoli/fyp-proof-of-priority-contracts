@@ -43,6 +43,22 @@ export declare namespace AcademicLedger {
     timestamp: bigint;
   };
 
+  export type ProjectFinalizationStruct = {
+    isFinalizationActive: boolean;
+    finalizationDeadline: BigNumberish;
+    isFinalized: boolean;
+  };
+
+  export type ProjectFinalizationStructOutput = [
+    isFinalizationActive: boolean,
+    finalizationDeadline: bigint,
+    isFinalized: boolean
+  ] & {
+    isFinalizationActive: boolean;
+    finalizationDeadline: bigint;
+    isFinalized: boolean;
+  };
+
   export type ResearcherProfileStruct = {
     name: string;
     orcid: string;
@@ -69,22 +85,32 @@ export declare namespace AcademicLedger {
 export interface AcademicLedgerInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "MAX_FINALIZATION_DURATION"
+      | "MIN_FINALIZATION_DURATION"
       | "authorizeCollaborator"
       | "authorizedCollaborators"
+      | "checkIfDisputed"
       | "doesProjectExist"
+      | "executeFinalization"
+      | "flagContributionAsDisputed"
       | "getContributionCount"
       | "getContributions"
+      | "getFinalizationStatus"
       | "getProfile"
       | "getProjectCollaborators"
       | "getUserProjects"
+      | "haltFinalization"
       | "hasProfile"
       | "initializeProject"
+      | "initiateFinalization"
       | "isAuthorized"
+      | "isDisputed"
       | "isProjectAdmin"
       | "logContribution"
       | "owner"
       | "projectAdmins"
       | "projectCollaborators"
+      | "projectFinalization"
       | "registerProfile"
       | "researcherProfiles"
       | "revokeCollaborator"
@@ -96,12 +122,24 @@ export interface AcademicLedgerInterface extends Interface {
     nameOrSignatureOrTopic:
       | "CollaboratorAuthorized"
       | "CollaboratorRevoked"
+      | "ContributionDisputed"
       | "ContributionLogged"
+      | "FinalizationExecuted"
+      | "FinalizationHalted"
+      | "FinalizationInitiated"
       | "ProfileRegistered"
       | "ProjectAdminTransferred"
       | "ProjectInitialized"
   ): EventFragment;
 
+  encodeFunctionData(
+    functionFragment: "MAX_FINALIZATION_DURATION",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "MIN_FINALIZATION_DURATION",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "authorizeCollaborator",
     values: [string, AddressLike]
@@ -111,8 +149,20 @@ export interface AcademicLedgerInterface extends Interface {
     values: [string, AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "checkIfDisputed",
+    values: [string, AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "doesProjectExist",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "executeFinalization",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "flagContributionAsDisputed",
+    values: [string, AddressLike, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "getContributionCount",
@@ -120,6 +170,10 @@ export interface AcademicLedgerInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getContributions",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getFinalizationStatus",
     values: [string]
   ): string;
   encodeFunctionData(
@@ -135,6 +189,10 @@ export interface AcademicLedgerInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "haltFinalization",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "hasProfile",
     values: [AddressLike]
   ): string;
@@ -143,8 +201,16 @@ export interface AcademicLedgerInterface extends Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "initiateFinalization",
+    values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "isAuthorized",
     values: [string, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isDisputed",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "isProjectAdmin",
@@ -162,6 +228,10 @@ export interface AcademicLedgerInterface extends Interface {
   encodeFunctionData(
     functionFragment: "projectCollaborators",
     values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "projectFinalization",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "registerProfile",
@@ -185,6 +255,14 @@ export interface AcademicLedgerInterface extends Interface {
   ): string;
 
   decodeFunctionResult(
+    functionFragment: "MAX_FINALIZATION_DURATION",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "MIN_FINALIZATION_DURATION",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "authorizeCollaborator",
     data: BytesLike
   ): Result;
@@ -193,7 +271,19 @@ export interface AcademicLedgerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "checkIfDisputed",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "doesProjectExist",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "executeFinalization",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "flagContributionAsDisputed",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -202,6 +292,10 @@ export interface AcademicLedgerInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getContributions",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getFinalizationStatus",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getProfile", data: BytesLike): Result;
@@ -213,15 +307,24 @@ export interface AcademicLedgerInterface extends Interface {
     functionFragment: "getUserProjects",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "haltFinalization",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "hasProfile", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "initializeProject",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "initiateFinalization",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "isAuthorized",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "isDisputed", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isProjectAdmin",
     data: BytesLike
@@ -237,6 +340,10 @@ export interface AcademicLedgerInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "projectCollaborators",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "projectFinalization",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -287,6 +394,28 @@ export namespace CollaboratorRevokedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace ContributionDisputedEvent {
+  export type InputTuple = [
+    projectId: string,
+    contributionHash: BytesLike,
+    reason: string
+  ];
+  export type OutputTuple = [
+    projectId: string,
+    contributionHash: string,
+    reason: string
+  ];
+  export interface OutputObject {
+    projectId: string;
+    contributionHash: string;
+    reason: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace ContributionLoggedEvent {
   export type InputTuple = [
     projectId: string,
@@ -308,6 +437,63 @@ export namespace ContributionLoggedEvent {
     cid: string;
     creditRole: string;
     timestamp: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace FinalizationExecutedEvent {
+  export type InputTuple = [projectId: string, timestamp: BigNumberish];
+  export type OutputTuple = [projectId: string, timestamp: bigint];
+  export interface OutputObject {
+    projectId: string;
+    timestamp: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace FinalizationHaltedEvent {
+  export type InputTuple = [
+    projectId: string,
+    haltedBy: AddressLike,
+    timestamp: BigNumberish
+  ];
+  export type OutputTuple = [
+    projectId: string,
+    haltedBy: string,
+    timestamp: bigint
+  ];
+  export interface OutputObject {
+    projectId: string;
+    haltedBy: string;
+    timestamp: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace FinalizationInitiatedEvent {
+  export type InputTuple = [
+    projectId: string,
+    admin: AddressLike,
+    deadline: BigNumberish
+  ];
+  export type OutputTuple = [
+    projectId: string,
+    admin: string,
+    deadline: bigint
+  ];
+  export interface OutputObject {
+    projectId: string;
+    admin: string;
+    deadline: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -430,6 +616,10 @@ export interface AcademicLedger extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  MAX_FINALIZATION_DURATION: TypedContractMethod<[], [bigint], "view">;
+
+  MIN_FINALIZATION_DURATION: TypedContractMethod<[], [bigint], "view">;
+
   authorizeCollaborator: TypedContractMethod<
     [_projectId: string, _collaborator: AddressLike],
     [void],
@@ -442,10 +632,33 @@ export interface AcademicLedger extends BaseContract {
     "view"
   >;
 
+  checkIfDisputed: TypedContractMethod<
+    [_projectId: string, _contributor: AddressLike, _timestamp: BigNumberish],
+    [boolean],
+    "view"
+  >;
+
   doesProjectExist: TypedContractMethod<
     [_projectId: string],
     [boolean],
     "view"
+  >;
+
+  executeFinalization: TypedContractMethod<
+    [_projectId: string],
+    [void],
+    "nonpayable"
+  >;
+
+  flagContributionAsDisputed: TypedContractMethod<
+    [
+      _projectId: string,
+      _contributor: AddressLike,
+      _timestamp: BigNumberish,
+      _reason: string
+    ],
+    [void],
+    "nonpayable"
   >;
 
   getContributionCount: TypedContractMethod<
@@ -457,6 +670,12 @@ export interface AcademicLedger extends BaseContract {
   getContributions: TypedContractMethod<
     [_projectId: string],
     [AcademicLedger.ContributionStructOutput[]],
+    "view"
+  >;
+
+  getFinalizationStatus: TypedContractMethod<
+    [_projectId: string],
+    [AcademicLedger.ProjectFinalizationStructOutput],
     "view"
   >;
 
@@ -478,10 +697,22 @@ export interface AcademicLedger extends BaseContract {
     "view"
   >;
 
+  haltFinalization: TypedContractMethod<
+    [_projectId: string],
+    [void],
+    "nonpayable"
+  >;
+
   hasProfile: TypedContractMethod<[_wallet: AddressLike], [boolean], "view">;
 
   initializeProject: TypedContractMethod<
     [_projectId: string],
+    [void],
+    "nonpayable"
+  >;
+
+  initiateFinalization: TypedContractMethod<
+    [_projectId: string, _durationSeconds: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -491,6 +722,8 @@ export interface AcademicLedger extends BaseContract {
     [boolean],
     "view"
   >;
+
+  isDisputed: TypedContractMethod<[arg0: BytesLike], [boolean], "view">;
 
   isProjectAdmin: TypedContractMethod<
     [_projectId: string, _wallet: AddressLike],
@@ -511,6 +744,18 @@ export interface AcademicLedger extends BaseContract {
   projectCollaborators: TypedContractMethod<
     [arg0: string, arg1: BigNumberish],
     [string],
+    "view"
+  >;
+
+  projectFinalization: TypedContractMethod<
+    [arg0: string],
+    [
+      [boolean, bigint, boolean] & {
+        isFinalizationActive: boolean;
+        finalizationDeadline: bigint;
+        isFinalized: boolean;
+      }
+    ],
     "view"
   >;
 
@@ -557,6 +802,12 @@ export interface AcademicLedger extends BaseContract {
   ): T;
 
   getFunction(
+    nameOrSignature: "MAX_FINALIZATION_DURATION"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "MIN_FINALIZATION_DURATION"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "authorizeCollaborator"
   ): TypedContractMethod<
     [_projectId: string, _collaborator: AddressLike],
@@ -567,8 +818,30 @@ export interface AcademicLedger extends BaseContract {
     nameOrSignature: "authorizedCollaborators"
   ): TypedContractMethod<[arg0: string, arg1: AddressLike], [boolean], "view">;
   getFunction(
+    nameOrSignature: "checkIfDisputed"
+  ): TypedContractMethod<
+    [_projectId: string, _contributor: AddressLike, _timestamp: BigNumberish],
+    [boolean],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "doesProjectExist"
   ): TypedContractMethod<[_projectId: string], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "executeFinalization"
+  ): TypedContractMethod<[_projectId: string], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "flagContributionAsDisputed"
+  ): TypedContractMethod<
+    [
+      _projectId: string,
+      _contributor: AddressLike,
+      _timestamp: BigNumberish,
+      _reason: string
+    ],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "getContributionCount"
   ): TypedContractMethod<[_projectId: string], [bigint], "view">;
@@ -577,6 +850,13 @@ export interface AcademicLedger extends BaseContract {
   ): TypedContractMethod<
     [_projectId: string],
     [AcademicLedger.ContributionStructOutput[]],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getFinalizationStatus"
+  ): TypedContractMethod<
+    [_projectId: string],
+    [AcademicLedger.ProjectFinalizationStructOutput],
     "view"
   >;
   getFunction(
@@ -593,11 +873,21 @@ export interface AcademicLedger extends BaseContract {
     nameOrSignature: "getUserProjects"
   ): TypedContractMethod<[_user: AddressLike], [string[]], "view">;
   getFunction(
+    nameOrSignature: "haltFinalization"
+  ): TypedContractMethod<[_projectId: string], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "hasProfile"
   ): TypedContractMethod<[_wallet: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "initializeProject"
   ): TypedContractMethod<[_projectId: string], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "initiateFinalization"
+  ): TypedContractMethod<
+    [_projectId: string, _durationSeconds: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "isAuthorized"
   ): TypedContractMethod<
@@ -605,6 +895,9 @@ export interface AcademicLedger extends BaseContract {
     [boolean],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "isDisputed"
+  ): TypedContractMethod<[arg0: BytesLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "isProjectAdmin"
   ): TypedContractMethod<
@@ -628,6 +921,19 @@ export interface AcademicLedger extends BaseContract {
   getFunction(
     nameOrSignature: "projectCollaborators"
   ): TypedContractMethod<[arg0: string, arg1: BigNumberish], [string], "view">;
+  getFunction(
+    nameOrSignature: "projectFinalization"
+  ): TypedContractMethod<
+    [arg0: string],
+    [
+      [boolean, bigint, boolean] & {
+        isFinalizationActive: boolean;
+        finalizationDeadline: bigint;
+        isFinalized: boolean;
+      }
+    ],
+    "view"
+  >;
   getFunction(
     nameOrSignature: "registerProfile"
   ): TypedContractMethod<[_name: string, _orcid: string], [void], "nonpayable">;
@@ -683,11 +989,39 @@ export interface AcademicLedger extends BaseContract {
     CollaboratorRevokedEvent.OutputObject
   >;
   getEvent(
+    key: "ContributionDisputed"
+  ): TypedContractEvent<
+    ContributionDisputedEvent.InputTuple,
+    ContributionDisputedEvent.OutputTuple,
+    ContributionDisputedEvent.OutputObject
+  >;
+  getEvent(
     key: "ContributionLogged"
   ): TypedContractEvent<
     ContributionLoggedEvent.InputTuple,
     ContributionLoggedEvent.OutputTuple,
     ContributionLoggedEvent.OutputObject
+  >;
+  getEvent(
+    key: "FinalizationExecuted"
+  ): TypedContractEvent<
+    FinalizationExecutedEvent.InputTuple,
+    FinalizationExecutedEvent.OutputTuple,
+    FinalizationExecutedEvent.OutputObject
+  >;
+  getEvent(
+    key: "FinalizationHalted"
+  ): TypedContractEvent<
+    FinalizationHaltedEvent.InputTuple,
+    FinalizationHaltedEvent.OutputTuple,
+    FinalizationHaltedEvent.OutputObject
+  >;
+  getEvent(
+    key: "FinalizationInitiated"
+  ): TypedContractEvent<
+    FinalizationInitiatedEvent.InputTuple,
+    FinalizationInitiatedEvent.OutputTuple,
+    FinalizationInitiatedEvent.OutputObject
   >;
   getEvent(
     key: "ProfileRegistered"
@@ -734,6 +1068,17 @@ export interface AcademicLedger extends BaseContract {
       CollaboratorRevokedEvent.OutputObject
     >;
 
+    "ContributionDisputed(string,bytes32,string)": TypedContractEvent<
+      ContributionDisputedEvent.InputTuple,
+      ContributionDisputedEvent.OutputTuple,
+      ContributionDisputedEvent.OutputObject
+    >;
+    ContributionDisputed: TypedContractEvent<
+      ContributionDisputedEvent.InputTuple,
+      ContributionDisputedEvent.OutputTuple,
+      ContributionDisputedEvent.OutputObject
+    >;
+
     "ContributionLogged(string,address,string,string,uint256)": TypedContractEvent<
       ContributionLoggedEvent.InputTuple,
       ContributionLoggedEvent.OutputTuple,
@@ -743,6 +1088,39 @@ export interface AcademicLedger extends BaseContract {
       ContributionLoggedEvent.InputTuple,
       ContributionLoggedEvent.OutputTuple,
       ContributionLoggedEvent.OutputObject
+    >;
+
+    "FinalizationExecuted(string,uint256)": TypedContractEvent<
+      FinalizationExecutedEvent.InputTuple,
+      FinalizationExecutedEvent.OutputTuple,
+      FinalizationExecutedEvent.OutputObject
+    >;
+    FinalizationExecuted: TypedContractEvent<
+      FinalizationExecutedEvent.InputTuple,
+      FinalizationExecutedEvent.OutputTuple,
+      FinalizationExecutedEvent.OutputObject
+    >;
+
+    "FinalizationHalted(string,address,uint256)": TypedContractEvent<
+      FinalizationHaltedEvent.InputTuple,
+      FinalizationHaltedEvent.OutputTuple,
+      FinalizationHaltedEvent.OutputObject
+    >;
+    FinalizationHalted: TypedContractEvent<
+      FinalizationHaltedEvent.InputTuple,
+      FinalizationHaltedEvent.OutputTuple,
+      FinalizationHaltedEvent.OutputObject
+    >;
+
+    "FinalizationInitiated(string,address,uint256)": TypedContractEvent<
+      FinalizationInitiatedEvent.InputTuple,
+      FinalizationInitiatedEvent.OutputTuple,
+      FinalizationInitiatedEvent.OutputObject
+    >;
+    FinalizationInitiated: TypedContractEvent<
+      FinalizationInitiatedEvent.InputTuple,
+      FinalizationInitiatedEvent.OutputTuple,
+      FinalizationInitiatedEvent.OutputObject
     >;
 
     "ProfileRegistered(address,string,string,uint256)": TypedContractEvent<

@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 
 async function main() {
   const [deployer] = await ethers.getSigners();
-  console.log("Deploying AcademicLedger v4 from:", deployer.address);
+  console.log("Deploying AcademicLedger v5 from:", deployer.address);
 
   const AcademicLedger = await ethers.getContractFactory("contracts/AcademicLedger.sol:AcademicLedger");
   const contract       = await AcademicLedger.deploy();
