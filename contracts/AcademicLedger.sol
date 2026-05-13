@@ -51,7 +51,6 @@ contract AcademicLedger {
     mapping(string  => address)                    public  projectAdmins;
     mapping(address => string[])                   public  userProjects;
     mapping(string  => bool)                       private projectExists;
-    string[]                                       public  allProjects;
 
     // Roster of all addresses ever authorized per project
     mapping(string  => address[])                  public  projectCollaborators;
@@ -204,7 +203,6 @@ contract AcademicLedger {
         projectAdmins[_projectId]                       = msg.sender;
         authorizedCollaborators[_projectId][msg.sender] = true;
         userProjects[msg.sender].push(_projectId);
-        allProjects.push(_projectId);
         projectCollaborators[_projectId].push(msg.sender); // roster track creator
 
         emit ProjectInitialized(_projectId, msg.sender, block.timestamp);
@@ -214,61 +212,7 @@ contract AcademicLedger {
     function getUserProjects(address _user)
         public view returns (string[] memory)
     {
-        string[] memory owned = userProjects[_user];
-        uint count = owned.length;
-        for (uint i = 0; i < allProjects.length; i++) {
-            if (authorizedCollaborators[allProjects[i]][_user]) {
-                bool already = false;
-                for (uint j = 0; j < owned.length; j++) {
-                    if (keccak256(abi.encodePacked(owned[j])) == keccak256(abi.encodePacked(allProjects[i]))) {
-                        already = true;
-                        break;
-                    }
-                }
-                if (!already) {
-                    count++;
-                }
-            }
-        }
-        string[] memory result = new string[](count);
-        uint idx = 0;
-        for (uint i = 0; i < owned.length; i++) {
-            result[idx++] = owned[i];
-        }
-        for (uint i = 0; i < allProjects.length; i++) {
-            if (authorizedCollaborators[allProjects[i]][_user]) {
-                bool already = false;
-                for (uint j = 0; j < owned.length; j++) {
-                    if (keccak256(abi.encodePacked(owned[j])) == keccak256(abi.encodePacked(allProjects[i]))) {
-                        already = true;
-                        break;
-                    }
-                }
-                if (!already) {
-                    result[idx++] = allProjects[i];
-                }
-            }
-        }
-        return result;
-    }
-
-    function syncUserProjects(address _user) external {
-        for (uint i = 0; i < allProjects.length; i++) {
-            string memory proj = allProjects[i];
-            if (authorizedCollaborators[proj][_user]) {
-                // Check if already in userProjects
-                bool already = false;
-                for (uint j = 0; j < userProjects[_user].length; j++) {
-                    if (keccak256(abi.encodePacked(userProjects[_user][j])) == keccak256(abi.encodePacked(proj))) {
-                        already = true;
-                        break;
-                    }
-                }
-                if (!already) {
-                    userProjects[_user].push(proj);
-                }
-            }
-        }
+        return userProjects[_user];
     }
 
     function doesProjectExist(string calldata _projectId)

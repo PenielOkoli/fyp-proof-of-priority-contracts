@@ -87,7 +87,6 @@ export interface AcademicLedgerInterface extends Interface {
     nameOrSignature:
       | "MAX_FINALIZATION_DURATION"
       | "MIN_FINALIZATION_DURATION"
-      | "allProjects"
       | "authorizeCollaborator"
       | "authorizedCollaborators"
       | "checkIfDisputed"
@@ -115,7 +114,6 @@ export interface AcademicLedgerInterface extends Interface {
       | "registerProfile"
       | "researcherProfiles"
       | "revokeCollaborator"
-      | "syncUserProjects"
       | "transferProjectAdmin"
       | "userProjects"
   ): FunctionFragment;
@@ -141,10 +139,6 @@ export interface AcademicLedgerInterface extends Interface {
   encodeFunctionData(
     functionFragment: "MIN_FINALIZATION_DURATION",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "allProjects",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "authorizeCollaborator",
@@ -252,10 +246,6 @@ export interface AcademicLedgerInterface extends Interface {
     values: [string, AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "syncUserProjects",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
     functionFragment: "transferProjectAdmin",
     values: [string, AddressLike]
   ): string;
@@ -270,10 +260,6 @@ export interface AcademicLedgerInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "MIN_FINALIZATION_DURATION",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "allProjects",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -370,10 +356,6 @@ export interface AcademicLedgerInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "revokeCollaborator",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "syncUserProjects",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -638,8 +620,6 @@ export interface AcademicLedger extends BaseContract {
 
   MIN_FINALIZATION_DURATION: TypedContractMethod<[], [bigint], "view">;
 
-  allProjects: TypedContractMethod<[arg0: BigNumberish], [string], "view">;
-
   authorizeCollaborator: TypedContractMethod<
     [_projectId: string, _collaborator: AddressLike],
     [void],
@@ -805,12 +785,6 @@ export interface AcademicLedger extends BaseContract {
     "nonpayable"
   >;
 
-  syncUserProjects: TypedContractMethod<
-    [_user: AddressLike],
-    [void],
-    "nonpayable"
-  >;
-
   transferProjectAdmin: TypedContractMethod<
     [_projectId: string, _newAdmin: AddressLike],
     [void],
@@ -833,9 +807,6 @@ export interface AcademicLedger extends BaseContract {
   getFunction(
     nameOrSignature: "MIN_FINALIZATION_DURATION"
   ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "allProjects"
-  ): TypedContractMethod<[arg0: BigNumberish], [string], "view">;
   getFunction(
     nameOrSignature: "authorizeCollaborator"
   ): TypedContractMethod<
@@ -988,9 +959,6 @@ export interface AcademicLedger extends BaseContract {
     [void],
     "nonpayable"
   >;
-  getFunction(
-    nameOrSignature: "syncUserProjects"
-  ): TypedContractMethod<[_user: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "transferProjectAdmin"
   ): TypedContractMethod<
